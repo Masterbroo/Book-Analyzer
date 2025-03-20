@@ -1,86 +1,61 @@
-async function analyzeBook(bookTitle) {
-    const API_KEY = 'AIzaSyDpujbyrAZ1I_hniPtJNZwnMClGSjfLj-A'; // Move to backend in production
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ DOM fully loaded");
 
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `Analyze the book "${bookTitle}". Provide:
-1. Page count (as number only)
-2. Estimated reading time in hours (average speed)
-3. Brief 50-word summary
-4. Top 3 categories
-Format as JSON: {"pageCount": number, "readingTime": number, "summary": string, "categories": string[]}`
-                    }]
-                }]
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('API Response:', data); // Debug: Check raw response
-
-        if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-            throw new Error('Invalid API response structure');
-        }
-
-        const responseText = data.candidates[0].content.parts[0].text.trim();
-        try {
-            return JSON.parse(responseText);
-        } catch (jsonError) {
-            console.error('JSON Parse Error:', jsonError, 'Response Text:', responseText);
-            throw new Error('API did not return valid JSON');
-        }
-    } catch (error) {
-        console.error('API Error:', error);
-        throw error;
-    }
-}
-
-async function processBook() {
     const bookInput = document.getElementById('bookInput');
-    const bookTitle = bookInput.value.trim();
+    const fetchButton = document.getElementById('fetchSummary');
+    const responseDiv = document.getElementById('response');
 
-    if (!bookTitle || bookTitle.length > 100) {
-        alert('Please enter a valid book title (max 100 characters).');
+    if (!bookInput || !fetchButton || !responseDiv) {
+        console.error("❌ Missing essential elements in DOM!");
         return;
     }
 
-    const loading = document.getElementById('loading');
-    const results = document.getElementById('results');
+    fetchButton.addEventListener("click", getBookSummary);
 
-    try {
-        loading.style.display = 'block'; // Show loading message
-        results.style.opacity = '0.5';   // Fade results
+    bookInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            getBookSummary();
+        }
+    });
 
-        const analysis = await analyzeBook(bookTitle);
+    async function getBookSummary() {
+        const bookTitle = bookInput.value.trim();
+        if (!bookTitle) {
+            alert("Please enter a book title!");
+            return;
+        }
 
-        // Update DOM with results
-        document.getElementById('pageCount').textContent = `${analysis.pageCount} pages`;
-        document.getElementById('readingTime').textContent = `${analysis.readingTime} hours (${Math.round(analysis.readingTime / 2)} days at 2hr/day)`;
-        document.getElementById('summary').textContent = analysis.summary;
-        document.getElementById('category').textContent = analysis.categories.join(' | ');
+        responseDiv.textContent = "⏳ Fetching summary...";
 
-    } catch (error) {
-        alert('Error analyzing book: ' + error.message);
-    } finally {
-        loading.style.display = 'none';  // Hide loading
-        results.style.opacity = '1';     // Restore results opacity
+        const API_KEY = "AIzaSyDpujbyrAZ1I_hniPtJNZwnMClGSjfLj-A"; // Secure this in a backend for production
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `Give a short summary of the book "${bookTitle}" give the page count, author, audience rating in emoji star and in numberic value out of 5, related books as bulleted points. you can add emojis too alongside. no need of bold font style. . Just output the text, no JSON.`
+                        }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const summaryText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+            if (!summaryText) throw new Error("No summary received!");
+
+            responseDiv.textContent = summaryText;
+
+        } catch (error) {
+            responseDiv.textContent = `❌ Error: ${error.message}`;
+        }
     }
-}
-
-// Event listeners
-document.getElementById('bookInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') processBook();
 });
-
-// Ensure the button works (already linked via onclick in HTML)
