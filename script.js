@@ -1,20 +1,21 @@
 async function analyzeBook(bookTitle) {
-    const API_KEY = 'AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE'; // Move this to a secure server-side endpoint
+    const API_KEY = 'AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE'; // For production, secure this in a backend
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 contents: [{
                     parts: [{
                         text: `Analyze the book "${bookTitle}". Provide:
-                        1. Page count (as number only)
-                        2. Estimated reading time in hours (average speed)
-                        3. Brief 50-word summary
-                        4. Top 3 categories
-                        Format as JSON: {"pageCount": number, "readingTime": number, "summary": string, "categories": string[]}`
+1. Page count (as number only)
+2. Estimated reading time in hours (average speed)
+3. Brief 50-word summary
+4. Top 3 categories
+Format as JSON: {"pageCount": number, "readingTime": number, "summary": string, "categories": string[]}`
                     }]
                 }]
             })
@@ -26,12 +27,11 @@ async function analyzeBook(bookTitle) {
 
         const data = await response.json();
 
-        // Extracting text response correctly
+        // Ensure the response structure is as expected
         if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
             throw new Error('Invalid API response structure');
         }
 
-        // Ensure response is properly formatted JSON
         const responseText = data.candidates[0].content.parts[0].text.trim();
         return JSON.parse(responseText);
 
@@ -50,7 +50,7 @@ async function processBook() {
 
     const loading = document.getElementById('loading');
     const results = document.getElementById('results');
-    
+
     try {
         loading.style.display = 'block';
         results.style.opacity = '0.5';
@@ -71,7 +71,7 @@ async function processBook() {
     }
 }
 
-// Enter key handler
+// Enter key handler for the book input
 document.getElementById('bookInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') processBook();
 });
