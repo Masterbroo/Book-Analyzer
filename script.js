@@ -33,7 +33,12 @@ Format as JSON: {"pageCount": number, "readingTime": number, "summary": string, 
         }
 
         const responseText = data.candidates[0].content.parts[0].text.trim();
-        return JSON.parse(responseText);
+        try {
+            return JSON.parse(responseText);
+        } catch (jsonError) {
+            console.error('JSON Parse Error:', jsonError, 'Response Text:', responseText);
+            throw new Error('Invalid JSON response format');
+        }
 
     } catch (error) {
         console.error('API Error:', error);
@@ -56,9 +61,9 @@ async function processBook() {
         results.style.opacity = '0.5';
 
         const analysis = await analyzeBook(bookTitle);
-        
+
         document.getElementById('pageCount').textContent = `${analysis.pageCount} pages`;
-        document.getElementById('readingTime').textContent = 
+        document.getElementById('readingTime').textContent =
             `${analysis.readingTime} hours (${Math.round(analysis.readingTime / 2)} days at 2hr/day)`;
         document.getElementById('summary').textContent = analysis.summary;
         document.getElementById('category').textContent = analysis.categories.join(' | ');
