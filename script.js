@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: `Give a short summary of the book "${bookTitle}" give the page count, author, audience rating in emoji star and in numberic value out of 5, related books as bulleted points. you can add emojis too alongside. no need of bold font style. . Just output the text, no JSON.`
+                            text: `Give a short summary of the book "${bookTitle}" give the page count, author, audience rating in emoji star and in numberic value out of 5, category of the book, list public awards given for the book, estimated time to read this book, related books as bulleted points. you can add emojis too alongside. no need of bold font style. . Just output the text, no JSON.`
                         }]
                     }]
                 })
