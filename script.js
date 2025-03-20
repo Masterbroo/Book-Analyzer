@@ -1,7 +1,7 @@
 async function analyzeBook(bookTitle) {
-    const API_KEY = 'AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE'; // Move this to a server-side endpoint for security
+    const API_KEY = 'AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE'; // Move this to a secure server-side endpoint
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -9,12 +9,12 @@ async function analyzeBook(bookTitle) {
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: `Analyze the book "${bookTitle}". Provide: 
+                        text: `Analyze the book "${bookTitle}". Provide:
                         1. Page count (as number only)
                         2. Estimated reading time in hours (average speed)
                         3. Brief 50-word summary
                         4. Top 3 categories
-                        Format as JSON: {pageCount: number, readingTime: number, summary: string, categories: string[]}`
+                        Format as JSON: {"pageCount": number, "readingTime": number, "summary": string, "categories": string[]}`
                     }]
                 }]
             })
@@ -25,11 +25,14 @@ async function analyzeBook(bookTitle) {
         }
 
         const data = await response.json();
-        if (!data.candidates || !data.candidates[0].content.parts[0].text) {
+
+        // Extracting text response correctly
+        if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
             throw new Error('Invalid API response structure');
         }
 
-        const responseText = data.candidates[0].content.parts[0].text;
+        // Ensure response is properly formatted JSON
+        const responseText = data.candidates[0].content.parts[0].text.trim();
         return JSON.parse(responseText);
 
     } catch (error) {
@@ -56,7 +59,7 @@ async function processBook() {
         
         document.getElementById('pageCount').textContent = `${analysis.pageCount} pages`;
         document.getElementById('readingTime').textContent = 
-            `${analysis.readingTime} hours (${Math.round(analysis.readingTime/24)} days at 2hr/day)`;
+            `${analysis.readingTime} hours (${Math.round(analysis.readingTime / 2)} days at 2hr/day)`;
         document.getElementById('summary').textContent = analysis.summary;
         document.getElementById('category').textContent = analysis.categories.join(' | ');
 
