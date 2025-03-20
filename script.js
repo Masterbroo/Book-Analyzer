@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         responseDiv.textContent = "⏳ Fetching summary...";
 
-        const API_KEY = "AIzaSyDpujbyrAZ1I_hniPtJNZwnMClGSjfLj-A"; // Secure this in a backend for production
+        const API_KEY = "AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE"; // Secure this in a backend for production
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
         try {
