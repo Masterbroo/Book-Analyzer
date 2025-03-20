@@ -3,46 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookMind AI - Smart Book Insights</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <title>AI Book Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2A2F4F;
+            --secondary: #917FB3;
+            --accent: #E5BEEC;
+            --background: #FDE2F3;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--background) 0%, #ffffff 100%);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, var(--accent) 0%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin: 2rem 0 0.5rem;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        p {
+            color: #666;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin: 2rem 0;
+            width: min(90%, 600px);
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        input {
+            padding: 1rem 1.5rem;
+            width: 100%;
+            font-size: 1rem;
+            border-radius: 15px;
+            border: 2px solid rgba(42, 47, 79, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 25px rgba(145, 127, 179, 0.2);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(42, 47, 79, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(42, 47, 79, 0.25);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+
+        #response {
+            margin: 2rem auto;
+            font-size: 1.1rem;
+            white-space: pre-line;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            width: min(90%, 800px);
+            min-height: 100px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        #response.loading {
+            background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(245,245,245,0.9) 50%, rgba(255,255,255,0.9) 100%);
+            background-size: 200% 200%;
+            animation: loadingShine 1.5s infinite;
+        }
+
+        @keyframes loadingShine {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                width: 90%;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, var(--accent), var(--secondary));
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+            opacity: 0.2;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>BookMind AI</h1>
-            <p>Discover books through artificial intelligence</p>
-        </header>
-
-        <div class="search-container">
-            <input type="text" placeholder="Enter book title..." id="bookInput">
-            <button onclick="processBook()">Analyze</button>
-        </div>
-
-        <div class="loading" id="loading">
-            Analyzing book with AI...
-        </div>
-
-        <div class="results-grid" id="results">
-            <div class="result-card">
-                <div class="result-title">📖 Page Count</div>
-                <div class="result-content" id="pageCount">-</div>
-            </div>
-            <div class="result-card">
-                <div class="result-title">⏳ Reading Time</div>
-                <div class="result-content" id="readingTime">-</div>
-            </div>
-            <div class="result-card">
-                <div class="result-title">📝 Summary</div>
-                <div class="result-content" id="summary">-</div>
-            </div>
-            <div class="result-card">
-                <div class="result-title">🔖 Category</div>
-                <div class="result-content" id="category">-</div>
-            </div>
-        </div>
+    <div class="particles">
+        <!-- Add some dynamic particles -->
+        <div class="particle" style="width: 50px; height: 50px; left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="width: 30px; height: 30px; left: 30%; animation-delay: -5s;"></div>
+        <div class="particle" style="width: 40px; height: 40px; left: 70%; animation-delay: -10s;"></div>
     </div>
 
+    <h1>AI Book Analyzer</h1>
+    <p>Enter a book title and see the analysis</p>
+    
+    <div class="input-group">
+        <input type="text" id="bookInput" placeholder="Enter book title..." />
+        <button id="fetchSummary">Analyze →</button>
+    </div>
+
+    <div id="response">Waiting for input...</div>
+
     <script src="script.js"></script>
+    <script>
+        // Add simple loading state
+        document.getElementById('fetchSummary').addEventListener('click', function() {
+            const response = document.getElementById('response');
+            response.classList.add('loading');
+            response.textContent = 'Analyzing literary patterns...';
+            
+            setTimeout(() => {
+                response.classList.remove('loading');
+            }, 3000);
+        });
+    </script>
 </body>
 </html>
