@@ -1,7 +1,7 @@
 async function analyzeBook(bookTitle) {
     const API_KEY = 'AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE'; // Move this to a secure server-side endpoint
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${AIzaSyAPEAzj1YO2bZ7r5eB4aTibqnUSVlKpolE}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
