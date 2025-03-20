@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMind | AI Book Analyzer</title>
+    <style>
+        /* RESET & GLOBAL STYLES */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: #f5f5f5; }
+
+        /* STICKY HEADER & SEARCH BAR */
+        .header {
+            background: #ffffff;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #bookSearch {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #007bff;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* RESULTS GRID */
+        .results {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #007bff;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .results { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="bookSearch" 
+                placeholder="Search a book title..." 
+                autocomplete="off"
+            >
+        </div>
+    </header>
+
+    <div class="results" id="results"></div>
+
+    <script>
+        // MOCK AI FUNCTION (Replace with Gemini API calls)
+        async function analyzeBook(bookTitle) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            return {
+                pageCount: Math.floor(Math.random() * 400) + 100,
+                readingTime: `${Math.floor(Math.random() * 10) + 5} hours`,
+                summary: "A simulated AI-generated summary about " + bookTitle,
+                category: ["Fiction", "Science Fiction", "Drama"][Math.floor(Math.random() * 3)]
+            };
+        }
+
+        // DOM ELEMENTS
+        const searchInput = document.getElementById('bookSearch');
+        const resultsDiv = document.getElementById('results');
+
+        // SEARCH HANDLER
+        searchInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const bookTitle = searchInput.value.trim();
+                if (!bookTitle) return;
+
+                // Show loading state
+                resultsDiv.innerHTML = '<div class="card">Analyzing... ⏳</div>';
+
+                // Fetch AI analysis
+                const data = await analyzeBook(bookTitle);
+
+                // Render results
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <h2>${bookTitle}</h2>
+                        <p>📖 ${data.pageCount} pages</p>
+                        <p>🕒 ${data.readingTime} to read</p>
+                    </div>
+                    <div class="card">
+                        <h3>Summary</h3>
+                        <p>${data.summary}</p>
+                    </div>
+                    <div class="card">
+                        <h3>Category</h3>
+                        <span class="category-tag">${data.category}</span>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
